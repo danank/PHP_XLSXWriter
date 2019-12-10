@@ -19,7 +19,10 @@ class XLSXWriter
 	protected $company;
 	protected $description;
 	protected $keywords = array();
-	
+	protected $oddHeader;
+	protected $oddFooter;
+	protected $orientation = 'default';
+
 	protected $current_sheet;
 	protected $sheets = array();
 	protected $temp_files = array();
@@ -43,6 +46,9 @@ class XLSXWriter
 	public function setDescription($description='') { $this->description=$description; }
 	public function setTempDir($tempdir='') { $this->tempdir=$tempdir; }
 	public function setRightToLeft($isRightToLeft=false){ $this->isRightToLeft=$isRightToLeft; }
+	public function setOddHeader($oddHeader=null) { $this->oddHeader=$oddHeader; }
+	public function setOddFooter($oddFooter=null) { $this->oddFooter=$oddFooter; }
+	public function setOrientation($orientation='') { $this->orientation=in_array($orientation,array('landscape','portrait'))?$orientation:'default'; }
 
 	public function __destruct()
 	{
@@ -310,12 +316,15 @@ class XLSXWriter
 			$sheet->file_writer->write(    '<autoFilter ref="A1:' . $max_cell . '"/>');			
 		}
 
+		if (is_null($this->oddHeader)) $this->oddHeader = '&amp;C&amp;&quot;Times New Roman,Regular&quot;&amp;12&amp;A';
+		if (is_null($this->oddFooter)) $this->oddFooter = '&amp;C&amp;&quot;Times New Roman,Regular&quot;&amp;12Page &amp;P';
+
 		$sheet->file_writer->write(    '<printOptions headings="false" gridLines="false" gridLinesSet="true" horizontalCentered="false" verticalCentered="false"/>');
 		$sheet->file_writer->write(    '<pageMargins left="0.5" right="0.5" top="1.0" bottom="1.0" header="0.5" footer="0.5"/>');
-		$sheet->file_writer->write(    '<pageSetup blackAndWhite="false" cellComments="none" copies="1" draft="false" firstPageNumber="1" fitToHeight="1" fitToWidth="1" horizontalDpi="300" orientation="portrait" pageOrder="downThenOver" paperSize="1" scale="100" useFirstPageNumber="true" usePrinterDefaults="false" verticalDpi="300"/>');
+		$sheet->file_writer->write(    '<pageSetup blackAndWhite="false" cellComments="none" copies="1" draft="false" firstPageNumber="1" fitToHeight="1" fitToWidth="1" horizontalDpi="300" orientation="'.$this->orientation.'" pageOrder="downThenOver" paperSize="1" scale="100" useFirstPageNumber="true" usePrinterDefaults="false" verticalDpi="300"/>');
 		$sheet->file_writer->write(    '<headerFooter differentFirst="false" differentOddEven="false">');
-		$sheet->file_writer->write(        '<oddHeader>&amp;C&amp;&quot;Times New Roman,Regular&quot;&amp;12&amp;A</oddHeader>');
-		$sheet->file_writer->write(        '<oddFooter>&amp;C&amp;&quot;Times New Roman,Regular&quot;&amp;12Page &amp;P</oddFooter>');
+		$sheet->file_writer->write(        '<oddHeader>' . $this->oddHeader . '</oddHeader>');
+		$sheet->file_writer->write(        '<oddFooter>' . $this->oddFooter . '</oddFooter>');
 		$sheet->file_writer->write(    '</headerFooter>');
 		$sheet->file_writer->write('</worksheet>');
 
