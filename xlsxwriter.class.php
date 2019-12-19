@@ -671,7 +671,7 @@ class XLSXWriter
 	protected function buildRelationshipsXML()
 	{
 		$rels_xml="";
-		$rels_xml.='<?xml version="1.0" encoding="UTF-8"?>'."\n";
+		$rels_xml.='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\n";
 		$rels_xml.='<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">';
 		$rels_xml.='<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>';
 		$rels_xml.='<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>';
@@ -685,8 +685,15 @@ class XLSXWriter
 		$i=0;
 		$workbook_xml="";
 		$workbook_xml.='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\n";
-		$workbook_xml.='<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">';
-		$workbook_xml.='<fileVersion appName="Calc"/><workbookPr backupFile="false" showObjects="all" date1904="false"/><workbookProtection/>';
+		$workbook_xml.='<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"' .
+				' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"' .
+				' xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="x15 xr xr6 xr10 xr2"' .
+				' xmlns:x15="http://schemas.microsoft.com/office/spreadsheetml/2010/11/main"' .
+				' xmlns:xr="http://schemas.microsoft.com/office/spreadsheetml/2014/revision"' .
+				' xmlns:xr6="http://schemas.microsoft.com/office/spreadsheetml/2016/revision6"' .
+				' xmlns:xr10="http://schemas.microsoft.com/office/spreadsheetml/2016/revision10"' .
+				' xmlns:xr2="http://schemas.microsoft.com/office/spreadsheetml/2015/revision2">';
+		$workbook_xml.='<fileVersion appName="Calc"/><workbookPr backupFile="false" showObjects="all" date1904="false"/>';
 		$workbook_xml.='<bookViews><workbookView activeTab="0" firstSheet="0" showHorizontalScroll="true" showSheetTabs="true" showVerticalScroll="true" tabRatio="212" windowHeight="8192" windowWidth="16384" xWindow="0" yWindow="0"/></bookViews>';
 		$workbook_xml.='<sheets>';
 		foreach($this->sheets as $sheet_name=>$sheet) {
@@ -706,7 +713,8 @@ class XLSXWriter
 			}
 		}
 		$workbook_xml.='</definedNames>';
-		$workbook_xml.='<calcPr iterateCount="100" refMode="A1" iterate="false" iterateDelta="0.001"/></workbook>';
+//		$workbook_xml.='<calcPr iterateCount="100" refMode="A1" iterate="false" iterateDelta="0.001"/>';
+		$workbook_xml.='</workbook>';
 		return $workbook_xml;
 	}
 
@@ -714,7 +722,7 @@ class XLSXWriter
 	{
 		$i=0;
 		$wkbkrels_xml="";
-		$wkbkrels_xml.='<?xml version="1.0" encoding="UTF-8"?>'."\n";
+		$wkbkrels_xml.='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\n";
 		$wkbkrels_xml.='<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">';
 		$wkbkrels_xml.='<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>';
 		foreach($this->sheets as $sheet_name=>$sheet) {
@@ -731,7 +739,7 @@ class XLSXWriter
 	protected function buildContentTypesXML()
 	{
 		$content_types_xml="";
-		$content_types_xml.='<?xml version="1.0" encoding="UTF-8"?>'."\n";
+		$content_types_xml.='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\n";
 		$content_types_xml.='<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">';
 		$content_types_xml.='<Override PartName="/_rels/.rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>';
 		$content_types_xml.='<Override PartName="/xl/_rels/workbook.xml.rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>';
