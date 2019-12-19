@@ -173,7 +173,7 @@ class XLSXWriter
 				'sheetname' => $sheet_name,
 				'xmlname' => $sheet_xmlname,
 				'row_count' => 0,
-				'file_writer' => new XLSXWriter_BuffererWriter($sheet_filename),
+				'file_writer' => new XLSXWriter_BuffererWriter($sheet_filename, 'w', true),
 				'columns' => array(),
 				'merge_cells' => array(),
 				'max_cell_tag_start' => 0,
@@ -628,7 +628,7 @@ class XLSXWriter
 	protected function writeSharedStringsXML()
 	{
 		$temporary_filename = $this->tempFilename();
-		$file = new XLSXWriter_BuffererWriter($temporary_filename);
+		$file = new XLSXWriter_BuffererWriter($temporary_filename, 'w', true);
 		$file->write('<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' . PHP_EOL);
 		$file->write('<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">');
 		foreach ($this->shared_strings as $value) {
@@ -958,8 +958,22 @@ class XLSXWriter_BuffererWriter
 	{
 		if ($this->fd) {
 			if ($this->check_utf8 && !self::isValidUTF8($this->buffer)) {
-				XLSXWriter::log("Error, invalid UTF8 encoding detected.");
-				$this->check_utf8 = false;
+				if (function_exists('utf8_encode')) {
+					$this->buffer = utf8_encode($this->buffer);
+				} elseif (function_exists('mb_convert_encoding')) {
+					if (!empty($this->buffer) && preg_match("/[^\w\s.,+=:#&*()\"'\/\-]+?/", $this->buffer)) {
+						$from_encoding = mb_detect_encoding($this->buffer, "UTF-8, ISO-8859-1, ISO-8859-15", true);
+						$this->buffer = mb_convert_encoding($this->buffer, "UTF-8", $from_encoding);
+					}
+				} elseif (function_exists('iconv')) {
+					if (!empty($this->buffer) && preg_match("/[^\w\s.,+=:#&*()\"'\/\-]+?/", $this->buffer)) {
+						$this->buffer = iconv("ISO-8859-1", "UTF-8", $this->buffer);
+					}
+				}
+				if (!self::isValidUTF8($this->buffer)) {
+					XLSXWriter::log("Error, invalid UTF8 encoding detected.");
+					$this->check_utf8 = false;
+				}
 			}
 			fwrite($this->fd, $this->buffer);
 			$this->buffer='';
